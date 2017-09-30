@@ -35,24 +35,37 @@
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gNB-0s-qmm">
+                                <rect key="frame" x="16" y="280" width="343" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="3SA-ff-ZIW"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="gNB-0s-qmm" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="1Dl-l7-Y69"/>
                             <constraint firstItem="JMu-Uu-Fp9" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="8tc-Un-6YT"/>
                             <constraint firstItem="kEZ-WS-FFo" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="ASJ-hO-JiK"/>
                             <constraint firstItem="kEZ-WS-FFo" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="32" id="FBb-iO-jlc"/>
                             <constraint firstItem="JMu-Uu-Fp9" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="JPR-o6-Cw2"/>
                             <constraint firstItem="ug7-Gz-aU6" firstAttribute="top" secondItem="kEZ-WS-FFo" secondAttribute="bottom" constant="116" id="VHb-HX-LVb"/>
                             <constraint firstItem="ug7-Gz-aU6" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="bmp-xt-ceG"/>
+                            <constraint firstItem="gNB-0s-qmm" firstAttribute="top" secondItem="ug7-Gz-aU6" secondAttribute="bottom" constant="8" id="gHI-er-8X0"/>
                             <constraint firstItem="JMu-Uu-Fp9" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="guz-M4-3Xo"/>
                             <constraint firstItem="JMu-Uu-Fp9" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="hdZ-Qd-NZp"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ug7-Gz-aU6" secondAttribute="trailing" constant="16" id="lcY-N4-13A"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="gNB-0s-qmm" secondAttribute="trailing" constant="16" id="zuf-fp-YOv"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="0It-Ct-NPv"/>
                     <connections>
                         <outlet property="hintLabel" destination="ug7-Gz-aU6" id="uNu-iv-UUM"/>
+                        <outlet property="meterLabel" destination="gNB-0s-qmm" id="g54-cz-pbi"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

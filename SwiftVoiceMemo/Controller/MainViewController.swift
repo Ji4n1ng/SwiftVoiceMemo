@@ -13,11 +13,12 @@ class MainViewController: UIViewController {
     
     // MARK: Properties
     
-    var recorder: AVAudioRecorder!
-    var player:AVAudioPlayer!
-    
+    /// 提示
     @IBOutlet weak var hintLabel: UILabel!
+    /// 时间仪表盘
+    @IBOutlet weak var meterLabel: UILabel!
     
+    /// 录音按钮
     lazy var recordButton: RecordButton = { [unowned self] in
         let button = RecordButton(frame:
             CGRect(x: (Config.Size.screenWidth - 120) / 2,
@@ -31,6 +32,7 @@ class MainViewController: UIViewController {
         return button
     }()
     
+    /// 播放按钮
     lazy var playButton: UIButton = { [unowned self] in
         let button = UIButton(frame:
             CGRect(x: 20,
@@ -46,6 +48,7 @@ class MainViewController: UIViewController {
         return button
     }()
     
+    /// 返回按钮
     lazy var backButton: UIButton = { [unowned self] in
         let button = UIButton(frame:
             CGRect(x: 20,
@@ -60,6 +63,17 @@ class MainViewController: UIViewController {
         button.layer.cornerRadius = button.bounds.height / 2
         return button
     }()
+    
+    /// 录音
+    var recorder: AVAudioRecorder!
+    /// 播放
+    var player:AVAudioPlayer!
+    /// 当前文件的 URL
+    var soundFileURL:URL!
+    /// 当前文件的名称
+    var soundFileName: String!
+    /// 仪表盘 Timer
+    var meterTimer:Timer!
     
     
     // MARK: Lifecycle
@@ -139,6 +153,93 @@ class MainViewController: UIViewController {
     }
     
     
+    // MARK: AVAudioSession
+    
+    func recordWithPermission() {
+        AVAudioSession.sharedInstance().requestRecordPermission() { [unowned self] granted in
+            if granted {
+                DispatchQueue.main.async {
+                    self.setSession(with: AVAudioSessionCategoryPlayAndRecord)
+                    self.setupRecorder()
+                    self.recorder.record()
+                    
+                    self.meterTimer = Timer.scheduledTimer(timeInterval: 0.1,
+                                                           target: self,
+                                                           selector: .updateMeter,
+                                                           userInfo: nil,
+                                                           repeats: true)
+                }
+            } else {
+                log("无录音权限", .error)
+            }
+        }
+        
+        if AVAudioSession.sharedInstance().recordPermission() == .denied {
+            log("录音权限被拒绝", .error)
+        }
+    }
+    
+    func setupRecorder() {
+        
+        let format = DateFormatter()
+        format.dateFormat = "yyyy-MM-dd-HH-mm-ss"
+        self.soundFileName = "\(format.string(from: Date())).m4a"
+        
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        self.soundFileURL = documentsDirectory.appendingPathComponent(soundFileName)
+        
+        if FileManager.default.fileExists(atPath: soundFileURL.absoluteString) {
+            log("soundfile \(soundFileURL.absoluteString) exists", .error)
+        }
+        
+        let recordSettings:[String : Any] = [
+            AVFormatIDKey:             kAudioFormatAppleLossless,
+            AVEncoderAudioQualityKey: AVAudioQuality.max.rawValue,
+            AVEncoderBitRateKey :      32000,
+            AVNumberOfChannelsKey:     2,
+            AVSampleRateKey :          44100.0
+        ]
+        
+        do {
+            recorder = try AVAudioRecorder(url: soundFileURL, settings: recordSettings)
+            recorder.delegate = self
+            recorder.isMeteringEnabled = true
+            recorder.prepareToRecord()
+        } catch {
+            recorder = nil
+            log(error.localizedDescription, .error)
+        }
+        
+    }
+    
+    func setSession(with category: String) {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(category, with: .defaultToSpeaker)
+        } catch {
+            log(error.localizedDescription, .error)
+        }
+        do {
+            try session.setActive(true)
+        } catch {
+            log(error.localizedDescription, .error)
+        }
+    }
+    
+    @objc func updateAudioMeter(_ timer:Timer) {
+        
+        if let recorder = self.recorder {
+            if recorder.isRecording {
+                let min = Int(recorder.currentTime / 60)
+                let sec = Int(recorder.currentTime.truncatingRemainder(dividingBy: 60))
+                let s = String(format: "%02d:%02d", min, sec)
+                meterLabel.text = s
+                recorder.updateMeters()
+            }
+        }
+    }
+    
+    
     // MARK: Button Action
     
     @objc func showVoiceListViewController() {
@@ -148,21 +249,39 @@ class MainViewController: UIViewController {
         navigationController.pushViewController(voiceListViewController, animated: true)
     }
     
-    @objc func recordButtonTapped(_ button: UIButton) {
-
+    @objc func playButtonTapped(_ button: UIButton) {
+        var url:URL?
+        if self.recorder != nil {
+            url = self.recorder.url
+        } else {
+            url = self.soundFileURL!
+        }
+        log("播放 \(String(describing: url))")
+        
+        do {
+            self.player = try AVAudioPlayer(contentsOf: url!)
+            playButton.isEnabled = false
+            player.delegate = self
+            player.prepareToPlay()
+            player.volume = 1.0
+            player.play()
+        } catch {
+            self.player = nil
+            log(error.localizedDescription, .error)
+        }
     }
     
-    @objc func playButtonTapped(_ button: UIButton) {
-        log("播放")
-    }
-
     @objc func backButtonTapped(_ button: UIButton) {
         log("返回")
         showRecordButton()
         self.hintLabel.text = "长按录音"
+        self.meterLabel.text = ""
+        if player != nil && player.isPlaying {
+            log("结束播放")
+            player.stop()
+        }
     }
-    
-    
+
 }
 
 extension MainViewController: RecordButtonDelegate {
@@ -170,23 +289,63 @@ extension MainViewController: RecordButtonDelegate {
     func recordButtonDidStartLongPress(_ button: RecordButton) {
         log("Long Press began")
         hintLabel.text = "录音中..."
+        recordWithPermission()
     }
     
     func recordButtonDidStopLongPress(_ button: RecordButton) {
-        log("Long Press cancelled")
+        log("Long Press stop")
+        recorder?.stop()
+        player?.stop()
+        meterTimer.invalidate()
+        
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setActive(false)
+        } catch {
+            log(error.localizedDescription, .error)
+        }
+        
+    }
+}
+
+// MARK: AVAudioRecorderDelegate
+extension MainViewController : AVAudioRecorderDelegate {
+    
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder,
+                                         successfully flag: Bool) {
         hintLabel.text = "录音完成"
+        playButton.setTitle("播放 \(soundFileName ?? "")", for: .normal)
         showPlayButton()
     }
     
+    func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder,
+                                          error: Error?) {
+        if let error = error {
+            log("\(error.localizedDescription)", .error)
+        }
+    }
     
+}
+
+// MARK: AVAudioPlayerDelegate
+extension MainViewController : AVAudioPlayerDelegate {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        log("播放结束")
+        playButton.isEnabled = true
+    }
+    
+    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
+        if let error = error {
+            log("\(error.localizedDescription)", .error)
+        }
+    }
 }
 
 fileprivate extension Selector {
     static let showList = #selector(MainViewController.showVoiceListViewController)
-    static let record = #selector(MainViewController.recordButtonTapped)
     static let play = #selector(MainViewController.playButtonTapped)
     static let back = #selector(MainViewController.backButtonTapped)
-//    static let longPress = #selector(MainViewController.longPress)
+    static let updateMeter = #selector(MainViewController.updateAudioMeter)
 
 }
 
