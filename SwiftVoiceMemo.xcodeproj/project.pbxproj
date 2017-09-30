@@ -8,22 +8,30 @@
 
 /* Begin PBXBuildFile section */
 		9542B57E1F7CA05600DB9D6B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9542B57D1F7CA05600DB9D6B /* AppDelegate.swift */; };
-		9542B5801F7CA05600DB9D6B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9542B57F1F7CA05600DB9D6B /* ViewController.swift */; };
+		9542B5801F7CA05600DB9D6B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9542B57F1F7CA05600DB9D6B /* MainViewController.swift */; };
 		9542B5831F7CA05600DB9D6B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9542B5811F7CA05600DB9D6B /* Main.storyboard */; };
 		9542B5861F7CA05700DB9D6B /* SwiftVoiceMemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 9542B5841F7CA05600DB9D6B /* SwiftVoiceMemo.xcdatamodeld */; };
 		9542B5881F7CA05700DB9D6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9542B5871F7CA05700DB9D6B /* Assets.xcassets */; };
 		9542B58B1F7CA05700DB9D6B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9542B5891F7CA05700DB9D6B /* LaunchScreen.storyboard */; };
+		957C7B281F7CE90C00B0DAD8 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957C7B271F7CE90C00B0DAD8 /* Config.swift */; };
+		959F84F61F7CEDA3000F3C5A /* VoiceListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 959F84F51F7CEDA3000F3C5A /* VoiceListViewController.swift */; };
+		95C1282D1F7F8AEE005F223A /* RecordButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C1282C1F7F8AEE005F223A /* RecordButton.swift */; };
+		95C1282F1F7F90D9005F223A /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C1282E1F7F90D9005F223A /* Log.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9542B57A1F7CA05600DB9D6B /* SwiftVoiceMemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftVoiceMemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9542B57D1F7CA05600DB9D6B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		9542B57F1F7CA05600DB9D6B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		9542B57F1F7CA05600DB9D6B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		9542B5821F7CA05600DB9D6B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9542B5851F7CA05600DB9D6B /* SwiftVoiceMemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SwiftVoiceMemo.xcdatamodel; sourceTree = "<group>"; };
 		9542B5871F7CA05700DB9D6B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9542B58A1F7CA05700DB9D6B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9542B58C1F7CA05700DB9D6B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		957C7B271F7CE90C00B0DAD8 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		959F84F51F7CEDA3000F3C5A /* VoiceListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceListViewController.swift; sourceTree = "<group>"; };
+		95C1282C1F7F8AEE005F223A /* RecordButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordButton.swift; sourceTree = "<group>"; };
+		95C1282E1F7F90D9005F223A /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,14 +65,50 @@
 			isa = PBXGroup;
 			children = (
 				9542B57D1F7CA05600DB9D6B /* AppDelegate.swift */,
-				9542B57F1F7CA05600DB9D6B /* ViewController.swift */,
+				957C7B271F7CE90C00B0DAD8 /* Config.swift */,
 				9542B5811F7CA05600DB9D6B /* Main.storyboard */,
+				957C7B2A1F7CEC3200B0DAD8 /* Model */,
+				957C7B2B1F7CEC5100B0DAD8 /* View */,
+				957C7B2C1F7CEC5600B0DAD8 /* Controller */,
+				957C7B261F7CE89C00B0DAD8 /* Tools */,
 				9542B5871F7CA05700DB9D6B /* Assets.xcassets */,
 				9542B5891F7CA05700DB9D6B /* LaunchScreen.storyboard */,
 				9542B58C1F7CA05700DB9D6B /* Info.plist */,
 				9542B5841F7CA05600DB9D6B /* SwiftVoiceMemo.xcdatamodeld */,
 			);
 			path = SwiftVoiceMemo;
+			sourceTree = "<group>";
+		};
+		957C7B261F7CE89C00B0DAD8 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				95C1282E1F7F90D9005F223A /* Log.swift */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		957C7B2A1F7CEC3200B0DAD8 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		957C7B2B1F7CEC5100B0DAD8 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				95C1282C1F7F8AEE005F223A /* RecordButton.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		957C7B2C1F7CEC5600B0DAD8 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				9542B57F1F7CA05600DB9D6B /* MainViewController.swift */,
+				959F84F51F7CEDA3000F3C5A /* VoiceListViewController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -139,8 +183,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9542B5801F7CA05600DB9D6B /* ViewController.swift in Sources */,
+				9542B5801F7CA05600DB9D6B /* MainViewController.swift in Sources */,
+				95C1282F1F7F90D9005F223A /* Log.swift in Sources */,
+				957C7B281F7CE90C00B0DAD8 /* Config.swift in Sources */,
+				95C1282D1F7F8AEE005F223A /* RecordButton.swift in Sources */,
 				9542B57E1F7CA05600DB9D6B /* AppDelegate.swift in Sources */,
+				959F84F61F7CEDA3000F3C5A /* VoiceListViewController.swift in Sources */,
 				9542B5861F7CA05700DB9D6B /* SwiftVoiceMemo.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
