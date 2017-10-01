@@ -40,7 +40,7 @@ class VoiceListViewController: UITableViewController {
     /// tableView 背景
     lazy var backImageView: UIImageView = {
         let imageView = UIImageView(frame: Config.Size.screenFrame)
-        imageView.image = UIImage(named: "mine_background")
+        imageView.image = #imageLiteral(resourceName: "mine_background")
         return imageView
     }()
     
@@ -89,7 +89,7 @@ class VoiceListViewController: UITableViewController {
         
         // 设置返回按钮
         let backButton = UIButton(frame: CGRect(x:0, y:0, width:30, height:30))
-        backButton.setImage(UIImage(named: "mine_btn_back"), for: .normal)
+        backButton.setImage(#imageLiteral(resourceName: "mine_btn_back"), for: .normal)
         backButton.addTarget(self, action: .back, for: .touchUpInside)
         backButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: -15, bottom: 0, right: 0)
         let menuBarItem = UIBarButtonItem(customView: backButton)
@@ -122,9 +122,7 @@ class VoiceListViewController: UITableViewController {
     }
     
     func stopPlaying() {
-        currentPlayingCellId = ""
-        isPausing = false
-        tableView.reloadData()
+        player?.stop()
     }
     
     // MARK: Button Action
@@ -242,8 +240,7 @@ extension VoiceListViewController: PlayButtonProtocol {
         for object in fetchedResultsController.fetchedObjects! {
             if object.id == id {
                 let fileName = object.name
-                let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-                url = documentsDirectory.appendingPathComponent(fileName)
+                url = getDocumentsDirectoryURL(with: fileName)
             }
         }
         log(url, .url)
@@ -266,7 +263,9 @@ extension VoiceListViewController : AVAudioPlayerDelegate {
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         log("播放结束")
-        stopPlaying()
+        currentPlayingCellId = ""
+        isPausing = false
+        tableView.reloadData()
     }
     
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 struct Config {
     
@@ -51,6 +52,16 @@ struct Config {
     
     struct Title {
         static let mine = "我的语音"
+    }
+    
+    struct Record {
+        static let settings:[String : Any] = [
+            AVFormatIDKey:             kAudioFormatAppleLossless,
+            AVEncoderAudioQualityKey: AVAudioQuality.max.rawValue,
+            AVEncoderBitRateKey :      32000,
+            AVNumberOfChannelsKey:     2,
+            AVSampleRateKey :          44100.0
+        ]
     }
     
 }

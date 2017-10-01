@@ -21,12 +21,8 @@ class MainViewController: UIViewController {
     
     /// 录音按钮
     lazy var recordButton: RecordButton = { [unowned self] in
-        let button = RecordButton(frame:
-            CGRect(x: (Config.Size.screenWidth - 120) / 2,
-                   y: Config.Size.screenHeight - 200,
-                   width: 120,
-                   height: 120))
-        button.setImage(UIImage.init(named: "main_btn_record"), for: .normal) // Why can't I use #imageLiteral(resourceName: "main_btn_record@2x.png") in Xcode 9 ?
+        let button = RecordButton(frame: Rect((Config.Size.screenWidth - 120) / 2, Config.Size.screenHeight - 200, 120, 120))
+        button.setImage(#imageLiteral(resourceName: "main_btn_record"), for: .normal)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = button.bounds.height / 2
         button.delegate = self
@@ -35,11 +31,7 @@ class MainViewController: UIViewController {
     
     /// 播放按钮
     lazy var playButton: UIButton = { [unowned self] in
-        let button = UIButton(frame:
-            CGRect(x: 20,
-                   y: Config.Size.screenHeight + 200,
-                   width: Config.Size.screenWidth - 40,
-                   height: 55))
+        let button = UIButton(frame: Rect(20, Config.Size.screenHeight + 200, Config.Size.screenWidth - 40, 55))
         button.addTarget(self, action: .play, for: .touchUpInside)
         button.backgroundColor = .white
         button.setTitleColor(#colorLiteral(red: 0, green: 0.4779999852, blue: 1, alpha: 1), for: .normal)
@@ -51,11 +43,7 @@ class MainViewController: UIViewController {
     
     /// 返回按钮
     lazy var backButton: UIButton = { [unowned self] in
-        let button = UIButton(frame:
-            CGRect(x: 20,
-                   y: Config.Size.screenHeight + 280,
-                   width: Config.Size.screenWidth - 40,
-                   height: 55))
+        let button = UIButton(frame: Rect(20, Config.Size.screenHeight + 280, Config.Size.screenWidth - 40, 55))
         button.addTarget(self, action: .back, for: .touchUpInside)
         button.backgroundColor = .white
         button.setTitleColor(#colorLiteral(red: 0, green: 0.4779999852, blue: 1, alpha: 1), for: .normal)
@@ -87,7 +75,6 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         configNavi()
         configUI()
     }
@@ -102,14 +89,14 @@ class MainViewController: UIViewController {
     func configNavi() {
         guard let navigationController = self.navigationController else { return }
         
-        // navigation bar translucent
+        // 导航栏透明
         navigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController.navigationBar.shadowImage = UIImage()
         navigationController.navigationBar.isTranslucent = true
         
-        // set up menu button
+        // 设置菜单按钮
         let menuButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-        menuButton.setImage(UIImage.init(named: "main_btn_menu"), for: .normal)
+        menuButton.setImage(#imageLiteral(resourceName: "main_btn_menu"), for: .normal)
         menuButton.addTarget(self, action: .showList, for: .touchUpInside)
         let menuBarItem = UIBarButtonItem(customView: menuButton)
         navigationItem.rightBarButtonItem = menuBarItem
@@ -120,10 +107,9 @@ class MainViewController: UIViewController {
         [recordButton, playButton, backButton].forEach {
             self.view.addSubview($0)
         }
-        
-        
     }
     
+    /// 显示录音按钮
     func showRecordButton() {
         UIView.animate(withDuration: 0.3, delay: 0.2, options: .curveEaseIn, animations: {
             self.recordButton.center.y += 100
@@ -141,6 +127,7 @@ class MainViewController: UIViewController {
         }, completion: nil)
     }
     
+    /// 显示播放和返回按钮
     func showPlayButton() {
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseIn, animations: {
             self.recordButton.center.y -= 100
@@ -193,29 +180,10 @@ class MainViewController: UIViewController {
         let fileName = String(date.ticks)
         self.soundFileName = "\(fileName).m4a"
         
-        
-        
-//        let format = DateFormatter()
-//        format.dateFormat = "yyyy-MM-dd-HH-mm-ss"
-//        self.soundFileName = "\(format.string(from: date)).m4a"
-        
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        self.soundFileURL = documentsDirectory.appendingPathComponent(soundFileName)
-        
-        if FileManager.default.fileExists(atPath: soundFileURL.absoluteString) {
-            log("soundfile \(soundFileURL.absoluteString) exists", .error)
-        }
-        
-        let recordSettings:[String : Any] = [
-            AVFormatIDKey:             kAudioFormatAppleLossless,
-            AVEncoderAudioQualityKey: AVAudioQuality.max.rawValue,
-            AVEncoderBitRateKey :      32000,
-            AVNumberOfChannelsKey:     2,
-            AVSampleRateKey :          44100.0
-        ]
+        self.soundFileURL = getDocumentsDirectoryURL(with: soundFileName)
         
         do {
-            recorder = try AVAudioRecorder(url: soundFileURL, settings: recordSettings)
+            recorder = try AVAudioRecorder(url: soundFileURL, settings: Config.Record.settings)
             recorder.delegate = self
             recorder.isMeteringEnabled = true
             recorder.prepareToRecord()
@@ -345,16 +313,14 @@ extension MainViewController: RecordButtonDelegate {
 // MARK: AVAudioRecorderDelegate
 extension MainViewController : AVAudioRecorderDelegate {
     
-    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder,
-                                         successfully flag: Bool) {
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         hintLabel.text = "已保存录音"
         playButton.setTitle("播放 \(soundFileName ?? "")", for: .normal)
         showPlayButton()
         saveSoundFile()
     }
     
-    func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder,
-                                          error: Error?) {
+    func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
         if let error = error {
             log("\(error.localizedDescription)", .error)
         }
@@ -381,6 +347,5 @@ fileprivate extension Selector {
     static let play = #selector(MainViewController.playButtonTapped)
     static let back = #selector(MainViewController.backButtonTapped)
     static let updateMeter = #selector(MainViewController.updateAudioMeter)
-
 }
 
