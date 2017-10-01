@@ -83,6 +83,11 @@ class MainViewController: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        player?.stop()
+    }
+    
     
     // MARK: Config
     
