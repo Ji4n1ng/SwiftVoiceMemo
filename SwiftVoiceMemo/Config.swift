@@ -17,8 +17,8 @@ struct Config {
     }
     
     struct Identifier {
-        static let mainViewController = "MainViewController"
-        static let VoiceListViewController = "VoiceListViewController"
+        static let mainViewController = "MainNaviViewController"
+        static let voiceListViewController = "VoiceListViewController"
     }
     
     struct Storyboard {
@@ -43,6 +43,14 @@ struct Config {
         static var screenFrame: CGRect {
             return CGRect(x: 0, y: 0, width: self.screenWidth, height: self.screenHeight)
         }
+    }
+    
+    struct Cell {
+        static let record = "RecordCell"
+    }
+    
+    struct Title {
+        static let mine = "我的语音"
     }
     
 }

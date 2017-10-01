@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import CoreData
 
 class MainViewController: UIViewController {
     
@@ -25,7 +26,7 @@ class MainViewController: UIViewController {
                    y: Config.Size.screenHeight - 200,
                    width: 120,
                    height: 120))
-        button.setImage(UIImage.init(named: "main_btn_record"), for: .normal) // Why can't I use #imageLiteral(resourceName: "main_btn_record@2x.png") ?
+        button.setImage(UIImage.init(named: "main_btn_record"), for: .normal) // Why can't I use #imageLiteral(resourceName: "main_btn_record@2x.png") in Xcode 9 ?
         button.layer.masksToBounds = true
         button.layer.cornerRadius = button.bounds.height / 2
         button.delegate = self
@@ -69,11 +70,17 @@ class MainViewController: UIViewController {
     /// 播放
     var player:AVAudioPlayer!
     /// 当前文件的 URL
-    var soundFileURL:URL!
+    var soundFileURL: URL!
     /// 当前文件的名称
     var soundFileName: String!
+    /// 当前文件的创建时间
+    var soundFileTime: Date!
+    /// 当前文件的持续时长
+    var soundFileDuration: Double!
     /// 仪表盘 Timer
     var meterTimer:Timer!
+    
+    var managedObjectContext: NSManagedObjectContext!
     
     
     // MARK: Lifecycle
@@ -93,20 +100,20 @@ class MainViewController: UIViewController {
     // MARK: Config
     
     func configNavi() {
-        if let navigationController = self.navigationController {
-            // navigation bar translucent
-            navigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
-            navigationController.navigationBar.shadowImage = UIImage()
-            navigationController.navigationBar.isTranslucent = true
-            
-            // set up menu button
-            let menuButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-            menuButton.setImage(UIImage.init(named: "main_btn_menu"), for: .normal)
-            menuButton.addTarget(self, action: .showList, for: .touchUpInside)
-            let menuBarItem = UIBarButtonItem(customView: menuButton)
-            navigationItem.rightBarButtonItem = menuBarItem
-            
-        }
+        guard let navigationController = self.navigationController else { return }
+        
+        // navigation bar translucent
+        navigationController.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController.navigationBar.shadowImage = UIImage()
+        navigationController.navigationBar.isTranslucent = true
+        
+        // set up menu button
+        let menuButton = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        menuButton.setImage(UIImage.init(named: "main_btn_menu"), for: .normal)
+        menuButton.addTarget(self, action: .showList, for: .touchUpInside)
+        let menuBarItem = UIBarButtonItem(customView: menuButton)
+        navigationItem.rightBarButtonItem = menuBarItem
+
     }
     
     func configUI() {
@@ -180,10 +187,17 @@ class MainViewController: UIViewController {
     }
     
     func setupRecorder() {
+        let date = Date()
+        self.soundFileTime = date
         
-        let format = DateFormatter()
-        format.dateFormat = "yyyy-MM-dd-HH-mm-ss"
-        self.soundFileName = "\(format.string(from: Date())).m4a"
+        let fileName = String(date.ticks)
+        self.soundFileName = "\(fileName).m4a"
+        
+        
+        
+//        let format = DateFormatter()
+//        format.dateFormat = "yyyy-MM-dd-HH-mm-ss"
+//        self.soundFileName = "\(format.string(from: date)).m4a"
         
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         self.soundFileURL = documentsDirectory.appendingPathComponent(soundFileName)
@@ -239,13 +253,30 @@ class MainViewController: UIViewController {
         }
     }
     
+    func saveSoundFile() {
+
+        let record = Record(context: managedObjectContext)
+        record.date = self.soundFileTime! as NSDate
+        record.name = self.soundFileName
+        record.duration = self.soundFileDuration
+        record.id = UUID().uuidString
+        
+        do {
+            try managedObjectContext.save()
+            log("saving...")
+        } catch {
+            log(error.localizedDescription, .error)
+        }
+    }
+    
     
     // MARK: Button Action
     
     @objc func showVoiceListViewController() {
         guard let navigationController = self.navigationController else { return }
         let storyboard = Config.Storyboard.main
-        let voiceListViewController = storyboard.instantiateViewController(withIdentifier: Config.Identifier.VoiceListViewController)
+        let voiceListViewController = storyboard.instantiateViewController(withIdentifier: Config.Identifier.voiceListViewController) as! VoiceListViewController
+        voiceListViewController.managedObjectContext = managedObjectContext
         navigationController.pushViewController(voiceListViewController, animated: true)
     }
     
@@ -294,6 +325,9 @@ extension MainViewController: RecordButtonDelegate {
     
     func recordButtonDidStopLongPress(_ button: RecordButton) {
         log("Long Press stop")
+        print(recorder.currentTime)
+        self.soundFileDuration = recorder.currentTime as Double
+        
         recorder?.stop()
         player?.stop()
         meterTimer.invalidate()
@@ -313,9 +347,10 @@ extension MainViewController : AVAudioRecorderDelegate {
     
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder,
                                          successfully flag: Bool) {
-        hintLabel.text = "录音完成"
+        hintLabel.text = "已保存录音"
         playButton.setTitle("播放 \(soundFileName ?? "")", for: .normal)
         showPlayButton()
+        saveSoundFile()
     }
     
     func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder,

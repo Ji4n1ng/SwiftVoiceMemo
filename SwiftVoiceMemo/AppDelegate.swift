@@ -13,10 +13,17 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
-
+    
+    lazy var managedObjectContext: NSManagedObjectContext = self.persistentContainer.viewContext
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        let mainNaviViewController = Config.Storyboard.main.instantiateViewController(withIdentifier: Config.Identifier.mainViewController) as! UINavigationController
+        let mainViewController = mainNaviViewController.topViewController as! MainViewController
+        mainViewController.managedObjectContext = managedObjectContext
+        self.window?.rootViewController = mainNaviViewController
+        self.window?.makeKeyAndVisible()
+        
         return true
     }
 
